@@ -5,7 +5,7 @@ import { MessageCircle, Phone } from "lucide-react";
 import { buildWhatsAppUrl } from "@/lib/utils";
 import { trackClick } from "@/lib/analytics";
 import { trackMetaContact } from "@/lib/meta-contact";
-import { formatPhoneDisplay, telHref } from "@/lib/phone-display";
+import { telHref } from "@/lib/phone-display";
 
 interface MinimalHeaderProps {
   /** Used only for analytics labelling. */
@@ -35,7 +35,6 @@ export function MinimalHeader({
   const whatsappUrl = buildWhatsAppUrl(whatsappNumber, whatsappInquiryMessage);
   const phoneForTel = callPhone ?? whatsappNumber;
   const tel = telHref(phoneForTel);
-  const phoneDisplay = formatPhoneDisplay(phoneForTel);
 
   const barClass = overHero
     ? "border-b border-white/15 bg-navy/30 backdrop-blur-md supports-[backdrop-filter]:bg-navy/20"
@@ -62,7 +61,7 @@ export function MinimalHeader({
         <div className="ms-auto flex items-center gap-2">
           <a
             href={tel}
-            aria-label={phoneDisplay ? `Call ${phoneDisplay}` : "Call us"}
+            aria-label="اتصل بنا"
             className={
               overHero
                 ? "inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-md border border-white/40 bg-white/10 px-3 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-white/20 transition-colors"
@@ -74,12 +73,7 @@ export function MinimalHeader({
             }}
           >
             <Phone size={16} strokeWidth={2.2} aria-hidden />
-            <span className="hidden xs:inline">اتصل</span>
-            {phoneDisplay ? (
-              <span className="hidden sm:inline tabular-nums opacity-90">
-                {phoneDisplay}
-              </span>
-            ) : null}
+            <span>اتصل بنا</span>
           </a>
           <a
             href={whatsappUrl}

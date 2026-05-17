@@ -5,6 +5,7 @@ import type { ProjectContent } from "@/types/project";
  */
 export const content: ProjectContent = {
   slug: "aliva",
+  showcaseLayout: "compact",
   projectName: "أليڤا",
   developer: "ماونتن ڤيو",
   city: "المستقبل سيتي",

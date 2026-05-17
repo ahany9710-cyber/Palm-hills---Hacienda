@@ -5,6 +5,7 @@ import type { ProjectContent } from "@/types/project";
  */
 export const content: ProjectContent = {
   slug: "grand-valleys",
+  showcaseLayout: "compact",
   projectName: "ماونتن ڤيو جراند فاليز",
   developer: "ماونتن ڤيو",
   city: "العاصمة الإدارية الجديدة",

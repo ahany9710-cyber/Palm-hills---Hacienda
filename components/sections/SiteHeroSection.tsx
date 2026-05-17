@@ -40,7 +40,7 @@ export function SiteHeroSection({
     <section
       className="relative min-h-[78vh] md:min-h-[85vh] overflow-hidden"
       style={{ marginTop: -HEADER_HEIGHT, paddingTop: HEADER_HEIGHT + 24 }}
-      aria-label="ماونتن ڤيو — ٣ مشاريع"
+      aria-label="ماونتن ڤيو — كريك ڤيو القاهرة الجديدة"
     >
       <div className="absolute inset-0 z-0">
         <Image

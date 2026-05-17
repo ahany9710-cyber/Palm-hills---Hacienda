@@ -38,10 +38,31 @@ export interface ProjectUnit {
   payment?: string
 }
 
+/** Row in the Creekview-style pricing grid (6-year starting prices + global payment/delivery notes). */
+export interface ProjectPricingTableRow {
+  unitType: string
+  configuration: string
+  builtUpSqm: string
+  /** Shown in Arabic; e.g. "٥٬٤٠٠٬٠٠٠ جنيه". */
+  price6yr: string
+}
+
+export interface ProjectPricingTable {
+  title?: string
+  rows: ProjectPricingTableRow[]
+  paymentPlanNote: string
+  deliveryNote: string
+  footnote?: string
+}
+
 export interface ProjectContent {
   slug: string
   projectName: string
   developer: string
+  /**
+   * `feature` = full showcase (default). `compact` = lighter section for secondary projects on multi-project home.
+   */
+  showcaseLayout?: "feature" | "compact"
   /** Short city/area label used in compare cards & breadcrumbs (e.g. "المستقبل سيتي"). */
   city?: string
   /** Long-form location description shown in the location section. */
@@ -55,6 +76,8 @@ export interface ProjectContent {
   galleryImages?: string[]
   /** Optional buyable unit types for the unit-cards strip. */
   units?: ProjectUnit[]
+  /** Optional pricing table (e.g. official launch grid); rendered instead of duplicating unit cards when set. */
+  pricingTable?: ProjectPricingTable
   /** Optional amenities chips (e.g. "نادي", "تراك جري"). */
   amenities?: string[]
   /** Legacy: hero image — kept for backwards compatibility. */

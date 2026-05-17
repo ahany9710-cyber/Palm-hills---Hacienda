@@ -18,15 +18,15 @@ import { FinalCTASection } from "@/components/sections/FinalCTASection";
 export const metadata: Metadata = {
   // `absolute` skips the layout's "%s | ماونتن ڤيو" template so the brand
   // doesn't get appended to a title that already starts with it.
-  title: { absolute: "ماونتن ڤيو — أليڤا، جراند فاليز، وإطلاق هايد بارك الجديد" },
+  title: { absolute: "ماونتن ڤيو — كريك ڤيو نيو كايرو، أليڤا، وجراند فاليز" },
   description:
-    "٣ مشاريع من ماونتن ڤيو في القاهرة الجديدة، المستقبل سيتي، والعاصمة الإدارية. مقدم يبدأ من ٥٪، تقسيط حتى ١٠ سنوات. احجز كلمة قصيرة على الهاتف أو واتساب.",
+    "إطلاق كريك ڤيو من ماونتن ڤيو في القاهرة الجديدة: واجهة مائية، جدول أسعار خطة ٦ سنوات، وتقسيط حتى ١٤ سنة. كمان أليڤا وجراند فاليز. تواصل واحجز.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "ماونتن ڤيو — ٣ مشاريع، مطور واحد",
+    title: "ماونتن ڤيو — كريك ڤيو القاهرة الجديدة",
     description:
-      "أليڤا، جراند فاليز، والإطلاق الجديد جوار هايد بارك — اتصل أو راسلنا واتساب.",
-    images: [{ url: "/projects/aliva/cover.png", width: 1200, height: 630 }],
+      "كريك ڤيو نيو كايرو: أسعار بداية، تقسيط حتى ١٤ سنة، وتسليم مبكر. أليڤا وجراند فاليز متاحين للمقارنة.",
+    images: [{ url: "/projects/creekview-new-cairo/cover.png", width: 1200, height: 630 }],
   },
 };
 
@@ -36,7 +36,7 @@ export default function HomePage() {
       <MinimalHeader
         whatsappNumber={SITE.whatsappNumber}
         callPhone={SITE.phoneNumber}
-        whatsappInquiryMessage="السلام عليكم، مهتم بمشاريع ماونتن ڤيو وأرغب بالتواصل مع المبيعات."
+        whatsappInquiryMessage="السلام عليكم، مهتم بكريك ڤيو نيو كايرو وأرغب في التفاصيل من المبيعات."
         overHero
       />
       <main className="pb-24 md:pb-0">
@@ -49,7 +49,7 @@ export default function HomePage() {
           image={SITE.hero.image}
           phoneNumber={SITE.phoneNumber}
           whatsappNumber={SITE.whatsappNumber}
-          whatsappMessage="السلام عليكم، شفت الإعلان وعايز أعرف تفاصيل مشاريع ماونتن ڤيو."
+          whatsappMessage="السلام عليكم، مهتم بكريك ڤيو وأرغب أعرف التفاصيل والأسعار."
         />
         <TrustStripSection facts={SITE.trustFacts} />
 
@@ -68,24 +68,24 @@ export default function HomePage() {
         <FinalCTASection
           phoneNumber={SITE.phoneNumber}
           whatsappNumber={SITE.whatsappNumber}
-          whatsappMessage="السلام عليكم، عايز أكلم مستشار مبيعات ماونتن ڤيو دلوقتي."
+          whatsappMessage="السلام عليكم، عايز أتكلم مع مستشار عن كريك ڤيو أو مشروع تاني من ماونتن ڤيو."
         />
       </main>
-      <MinimalFooter tagline="ماونتن ڤيو في القاهرة الجديدة، المستقبل سيتي، والعاصمة الإدارية" />
+      <MinimalFooter tagline="ماونتن ڤيو — كريك ڤيو القاهرة الجديدة، ومشاريع أخرى" />
       <FloatingWhatsApp
         phoneNumber={SITE.whatsappNumber}
-        message="السلام عليكم، شفت الإعلان وعايز أعرف تفاصيل."
+        message="السلام عليكم، مهتم بكريك ڤيو وأرغب في التفاصيل."
       />
       <LeadPopup
         projects={ALL_PROJECTS}
         phoneNumber={SITE.phoneNumber}
         whatsappNumber={SITE.whatsappNumber}
-        triggerSelector="#hyde-park-launch"
+        triggerSelector="#creekview-new-cairo"
       />
       <StickyMobileCTA
         whatsappNumber={SITE.whatsappNumber}
         callPhone={SITE.phoneNumber}
-        whatsappMessage="السلام عليكم، شفت الإعلان وعايز أكلم مستشار مبيعات ماونتن ڤيو."
+        whatsappMessage="السلام عليكم، مهتم بكريك ڤيو أو مشاريع ماونتن ڤيو — عايز أكلم المبيعات."
       />
     </>
   );

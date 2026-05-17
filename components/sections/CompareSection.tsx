@@ -46,6 +46,7 @@ export function CompareSection({ projects }: CompareSectionProps) {
             { whatsappNumber: p.whatsappNumber, projectName: p.projectName },
             "pricing"
           );
+          const isLaunch = p.slug === "creekview-new-cairo";
           return (
             <motion.article
               key={p.slug}
@@ -53,8 +54,17 @@ export function CompareSection({ projects }: CompareSectionProps) {
               whileInView={v.animate}
               viewport={v.viewport}
               transition={{ delay: i * 0.06 }}
-              className="rounded-xl border border-navy/10 bg-white p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col"
+              className={
+                isLaunch
+                  ? "relative rounded-xl border border-amber-400/50 bg-white px-5 pb-5 pt-6 shadow-md ring-2 ring-amber-400/35 hover:shadow-lg transition-shadow flex flex-col md:scale-[1.02] md:z-10"
+                  : "rounded-xl border border-navy/10 bg-white p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col"
+              }
             >
+              {isLaunch ? (
+                <p className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-amber-500 px-3 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white shadow-sm">
+                  الإطلاق الجديد
+                </p>
+              ) : null}
               <p className="text-xs font-semibold uppercase tracking-widest text-amber-700">
                 {p.developer}
               </p>
