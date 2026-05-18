@@ -218,8 +218,10 @@
 .cv-page .hero-thumbs {
   position: absolute; left: 32px; bottom: 36px; z-index: 3;
   display: flex; flex-direction: column; gap: 10px;
+  pointer-events: none;
 }
 .cv-page .hero-thumb {
+  pointer-events: auto;
   width: 88px; height: 64px; border-radius: 8px; overflow: hidden;
   border: 2px solid transparent; cursor: pointer; transition: border .2s, transform .2s;
   background-size: cover; background-position: center;
@@ -378,7 +380,7 @@
 .cv-page .lifestyle .quote-mark { font-family: var(--cv-serif); font-size: 80px; color: var(--cv-gold); line-height: 0; height: 30px; opacity: .6; }
 
 /* ============ LEAD FORM SECTION ============ */
-.cv-page .lead { background: var(--cv-cream); position: relative; overflow: hidden; }
+.cv-page .lead { background: var(--cv-cream); position: relative; overflow: hidden; scroll-margin-top: 112px; }
 .cv-page .lead-grid { display: grid; grid-template-columns: 1fr 1.05fr; gap: 64px; align-items: stretch; }
 .cv-page .lead-left { display: flex; flex-direction: column; justify-content: space-between; padding: 8px 0; }
 .cv-page .lead-left h2 { font-family: var(--cv-serif); font-style: italic; font-weight: 400; font-size: clamp(36px, 5vw, 60px); line-height: 1.05; margin: 18px 0; color: var(--cv-ink); }
@@ -581,6 +583,7 @@
   color: rgba(255,255,255,.7); font-family: var(--cv-sans); font-size: 11px; letter-spacing: .3em;
   display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 3;
   text-transform: uppercase;
+  pointer-events: none;
 }
 .cv-page .scroll-hint .line { width: 1px; height: 48px; background: rgba(255,255,255,.4); position: relative; overflow: hidden; }
 .cv-page .scroll-hint .line::after { content: ""; position: absolute; top: -24px; left: 0; right: 0; height: 24px; background: var(--cv-gold); animation: cv-slide 2s infinite ease-in-out; }

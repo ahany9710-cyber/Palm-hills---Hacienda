@@ -240,7 +240,7 @@ export function SiteCreekLanding() {
                     <path d="M14 2 v6 h6" />
                     <path d="M9 13 h6 M9 17 h6" />
                   </svg>
-                  سجّل اهتمامك
+                  احجز مكانك بشيك
                 </a>
               </div>
 
