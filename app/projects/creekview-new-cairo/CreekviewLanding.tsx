@@ -1,12 +1,19 @@
 "use client";
 
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
+import { content as creekProject } from "@/content/projects/creekview-new-cairo";
+import { FORMSPREE_LEAD_ENDPOINT } from "@/lib/formspree";
+import { isValidEgyptPhone, normalizePhone } from "@/lib/validation";
 import "./creekview.css";
 
-const PHONE = "201223147238";
-const WHATSAPP = "201118884994";
-const WA_BASE = `https://wa.me/${WHATSAPP}`;
-const waLink = (msg: string) => `${WA_BASE}?text=${encodeURIComponent(msg)}`;
+/** Internal redirects — لا تُظهر أرقام المبيعات في `href`. انظر `app/r/creek-call`, `app/r/creek-wa`. */
+const CALL_HREF = "/r/creek-call";
+const creekWaPreset = (
+  t: "inquiry" | "details" | "full_table" | "form_followup",
+) => `/r/creek-wa?t=${t}`;
+const creekWaMsg = (msg: string) => `/r/creek-wa?msg=${encodeURIComponent(msg)}`;
 
 const HERO_IMAGES = [
   "/projects/creekview-new-cairo/creek-01.jpeg",
@@ -54,20 +61,24 @@ function PhoneIcon({ size = 14 }: { size?: number }) {
 
 function WhatsAppIcon({ size = 15 }: { size?: number }) {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size}>
-      <path d="M20.52 3.48A11.85 11.85 0 0 0 12.07 0C5.46 0 .1 5.36.1 11.97a11.9 11.9 0 0 0 1.6 6L0 24l6.18-1.62a11.97 11.97 0 0 0 5.89 1.5h.01c6.6 0 11.96-5.36 11.96-11.97 0-3.2-1.24-6.2-3.52-8.43z" />
+    <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size} aria-hidden>
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.435 9.884-9.881 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.088 5.972L0 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
     </svg>
   );
 }
 
 export function CreekviewLanding() {
+  const router = useRouter();
   const [heroIdx, setHeroIdx] = useState(0);
   const [heroFading, setHeroFading] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [budget, setBudget] = useState<string | null>(null);
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [submittedPhone, setSubmittedPhone] = useState("");
-  const [formErrors, setFormErrors] = useState<{ name?: string; phone?: string }>({});
+  const [formSubmitting, setFormSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<{
+    name?: string;
+    phone?: string;
+    form?: string;
+  }>({});
 
   const switchHero = useCallback((i: number) => {
     setHeroFading(true);
@@ -84,18 +95,67 @@ export function CreekviewLanding() {
     return () => clearInterval(interval);
   }, [heroIdx, switchHero]);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const name = (form.elements.namedItem("name") as HTMLInputElement).value.trim();
     const phone = (form.elements.namedItem("phone") as HTMLInputElement).value.trim();
+    const unitType = (form.elements.namedItem("type") as HTMLSelectElement).value;
     const errors: { name?: string; phone?: string } = {};
     if (name.length < 2) errors.name = "من فضلك ادخل الاسم";
-    if (!/^[0-9+\s]{7,}$/.test(phone)) errors.phone = "رقم الموبايل غير صحيح";
+    if (!phone.trim()) errors.phone = "رقم الموبايل مطلوب";
+    else if (!isValidEgyptPhone(phone)) {
+      errors.phone =
+        "رقم هاتف صحيح مطلوب (مصر، السعودية، البحرين، الإمارات، قطر)";
+    }
     setFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
-    setSubmittedPhone(phone);
-    setFormSubmitted(true);
+
+    setFormSubmitting(true);
+    setFormErrors({});
+
+    const payload: Record<string, string> = {
+      phone: normalizePhone(phone) || phone.trim(),
+      project_slug: creekProject.slug,
+      project_name: creekProject.projectName,
+      source: "creek-landing",
+      unit_interest: unitType,
+      approximate_budget: budget ?? "",
+      _subject: `استفسار ماونتن ڤيو — ${name || "عميل"} — ${creekProject.projectName}`,
+    };
+    if (name) payload.name = name;
+
+    try {
+      const res = await fetch(FORMSPREE_LEAD_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        errors?: Record<string, string>;
+      };
+
+      if (!res.ok) {
+        const msg =
+          (typeof data.error === "string" && data.error) ||
+          Object.values(data.errors ?? {})[0] ||
+          "تعذر إرسال النموذج. حاول مرة أخرى.";
+        setFormErrors({ form: msg });
+        return;
+      }
+
+      router.push("/thank-you");
+    } catch {
+      setFormErrors({
+        form: "حدث خطأ في الاتصال. تحقق من الإنترنت وحاول مجدداً.",
+      });
+    } finally {
+      setFormSubmitting(false);
+    }
   }
 
   return (
@@ -112,13 +172,13 @@ export function CreekviewLanding() {
             <span>إطلاق جديد · كريك ڤيو</span>
           </div>
           <div className="utility-right">
-            <a href={`tel:+${PHONE}`} aria-label="Call">
+            <a href={CALL_HREF} aria-label="اتصل بماونتن ڤيو">
               <PhoneIcon size={13} />
-              <span>+20 122 314 7238</span>
+              <span>اتصل بماونتن ڤيو</span>
             </a>
-            <a href={waLink("السلام عليكم، مهتم بمشروع كريك ڤيو")} aria-label="WhatsApp">
+            <a href={creekWaPreset("inquiry")} aria-label="راسلنا على واتساب">
               <WhatsAppIcon size={13} />
-              <span>+20 111 888 4994</span>
+              <span>راسلنا على واتساب</span>
             </a>
           </div>
         </div>
@@ -128,10 +188,15 @@ export function CreekviewLanding() {
       <header className="cv-header">
         <div className="wrap">
           <div className="brand">
-            <div className="brand-mark">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
-                <path d="M12 3 L3 12 H7 V21 H17 V12 H21 Z" strokeLinejoin="round" />
-              </svg>
+            <div className="brand-mark brand-mark--mv">
+              <Image
+                src="/Mountain View Logo.webp"
+                alt="Mountain View — ماونتن ڤيو"
+                width={140}
+                height={36}
+                priority
+                sizes="150px"
+              />
             </div>
             <div className="brand-text">
               <span className="a">MOUNTAIN VIEW</span>
@@ -139,13 +204,16 @@ export function CreekviewLanding() {
             </div>
           </div>
           <nav className="header-cta">
-            <a className="ph" href={`tel:+${PHONE}`} aria-label="اتصل بنا">
+            <a className="ph" href={CALL_HREF} aria-label="اتصل بنا">
               <PhoneIcon />
               <span className="t">اتصل الآن</span>
             </a>
-            <a className="wa" href={waLink("السلام عليكم، مهتم بمشروع كريك ڤيو")} aria-label="واتساب">
-              <WhatsAppIcon />
-              <span className="t">سجّل اهتمامك</span>
+            <a className="wa" href="#lead" aria-label="احجز مكانك على الماستر بلان">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width={16} height={16} aria-hidden>
+                <path d="M14 2 H6 a2 2 0 0 0-2 2 v16 a2 2 0 0 0 2 2 h12 a2 2 0 0 0 2-2 V8 z" />
+                <path d="M14 2 v6 h6 M9 13 h6 M9 17 h6" />
+              </svg>
+              <span className="t">احجز مكانك على الماستر بلان</span>
             </a>
           </nav>
         </div>
@@ -182,11 +250,11 @@ export function CreekviewLanding() {
 
             <div className="hero-bottom">
               <div className="hero-ctas">
-                <a className="btn btn-call" href={`tel:+${PHONE}`}>
+                <a className="btn btn-call" href={CALL_HREF}>
                   <PhoneIcon size={18} />
                   اتصل بنا الآن
                 </a>
-                <a className="btn btn-wa" href={waLink("السلام عليكم، مهتم بمشروع كريك ڤيو وأرغب في التفاصيل والأسعار")}>
+                <a className="btn btn-wa" href={creekWaPreset("details")}>
                   <WhatsAppIcon size={18} />
                   كلمنا واتساب
                 </a>
@@ -369,7 +437,14 @@ export function CreekviewLanding() {
                 <div className="unit-meta"><small>خطة السداد</small>٦ سنوات · حتى ١٤</div>
                 <div className="unit-price">{u.priceFull}<small>سعر بداية على خطة ٦ سنوات</small></div>
                 <div className="unit-cta">
-                  <button onClick={() => window.location.href = waLink(`السلام عليكم، مهتم بـ ${u.tag} ${u.type} في كريك ڤيو`)}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.location.href = creekWaMsg(
+                        `السلام عليكم، مهتم بـ ${u.tag} ${u.type} في كريك ڤيو`,
+                      );
+                    }}
+                  >
                     <WhatsAppIcon size={13} />
                     السعر النهائي
                   </button>
@@ -383,7 +458,11 @@ export function CreekviewLanding() {
 
           <div className="units-foot">
             <p>* الجدول والأسعار وفقاً لمادة الإطلاق الرسمية من ماونتن ڤيو. التوفر والمراحل تتغيّر — يُفضل تثبيت العرض مع المبيعات.</p>
-            <a className="btn btn-wa" href={waLink("السلام عليكم، محتاج جدول كريك ڤيو الكامل")} style={{ background: "var(--cv-ink)", color: "var(--cv-cream)" }}>
+            <a
+              className="btn btn-wa"
+              href={creekWaPreset("full_table")}
+              style={{ background: "var(--cv-ink)", color: "var(--cv-cream)" }}
+            >
               <WhatsAppIcon size={16} />
               استلام الجدول كامل عبر واتساب
             </a>
@@ -430,74 +509,66 @@ export function CreekviewLanding() {
             </div>
 
             <div className="lead-card">
-              {formSubmitted ? (
-                <div className="success">
-                  <div className="success-mark">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width={28} height={28}><path d="M4 12 L10 18 L20 6" /></svg>
+              <>
+                <h3>طلب التفاصيل</h3>
+                <div className="sub">٣٠ ثانية فقط — استمارة قصيرة</div>
+                <form onSubmit={handleSubmit} autoComplete="on">
+                  <div className="row2c">
+                    <div className="field">
+                      <label htmlFor="lf-name">الاسم</label>
+                      <input id="lf-name" name="name" type="text" placeholder="اسمك بالكامل" required disabled={formSubmitting} />
+                      <div className="err">{formErrors.name || ""}</div>
+                    </div>
+                    <div className="field">
+                      <label htmlFor="lf-phone">رقم الموبايل</label>
+                      <input id="lf-phone" name="phone" type="tel" placeholder="01XXXXXXXXX" inputMode="numeric" required disabled={formSubmitting} />
+                      <div className="err">{formErrors.phone || ""}</div>
+                    </div>
                   </div>
-                  <h3 className="serif">تم استلام طلبك</h3>
-                  <p style={{ color: "var(--cv-stone)", margin: "8px 0 22px" }}>
-                    مستشار المبيعات هيتواصل معاك خلال الساعة على رقم<br />
-                    <strong style={{ color: "var(--cv-ink)" }}>{submittedPhone}</strong>
-                  </p>
-                  <a className="btn btn-wa" style={{ display: "inline-flex" }} href={waLink("السلام عليكم، لسه بعتلكم استمارة كريك ڤيو — أرغب في التفاصيل بسرعة")}>
-                    <WhatsAppIcon size={16} />
-                    ابدأ محادثة فورية بدل الانتظار
-                  </a>
-                </div>
-              ) : (
-                <>
-                  <h3>طلب التفاصيل</h3>
-                  <div className="sub">٣٠ ثانية فقط — استمارة قصيرة</div>
-                  <form onSubmit={handleSubmit} autoComplete="on">
-                    <div className="row2c">
-                      <div className="field">
-                        <label htmlFor="lf-name">الاسم</label>
-                        <input id="lf-name" name="name" type="text" placeholder="اسمك بالكامل" required />
-                        <div className="err">{formErrors.name || ""}</div>
-                      </div>
-                      <div className="field">
-                        <label htmlFor="lf-phone">رقم الموبايل</label>
-                        <input id="lf-phone" name="phone" type="tel" placeholder="01XXXXXXXXX" inputMode="numeric" required />
-                        <div className="err">{formErrors.phone || ""}</div>
-                      </div>
+                  <div className="field">
+                    <label htmlFor="lf-type">نوع الوحدة المطلوبة</label>
+                    <select id="lf-type" name="type" disabled={formSubmitting}>
+                      <option>Millennial — غرفة نوم</option>
+                      <option>Garden Millennial — غرفة نوم</option>
+                      <option>Millennial — غرفتين</option>
+                      <option>Garden Millennial — غرفتين</option>
+                      <option>Millennial — ٣ غرف</option>
+                      <option>Garden Millennial — ٣ غرف</option>
+                      <option>Skyvilla — ٣ غرف</option>
+                      <option>I-villa Garden — ٣ غرف</option>
+                      <option>غير متأكد بعد — محتاج استشارة</option>
+                    </select>
+                  </div>
+                  <div className="field">
+                    <label>الميزانية التقريبية</label>
+                    <div className="budget-chips">
+                      {["٥–٧ مليون", "٧–٩ مليون", "٩–١٢ مليون", "١٢ مليون+", "أحتاج استشارة"].map((b) => (
+                        <div
+                          key={b}
+                          className={`chip ${budget === b ? "active" : ""}`}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => !formSubmitting && setBudget(b)}
+                          onKeyDown={(ev) => {
+                            if ((ev.key === "Enter" || ev.key === " ") && !formSubmitting)
+                              setBudget(b);
+                          }}
+                        >
+                          {b}
+                        </div>
+                      ))}
                     </div>
-                    <div className="field">
-                      <label>نوع الوحدة المطلوبة</label>
-                      <select name="type">
-                        <option>Millennial — غرفة نوم</option>
-                        <option>Garden Millennial — غرفة نوم</option>
-                        <option>Millennial — غرفتين</option>
-                        <option>Garden Millennial — غرفتين</option>
-                        <option>Millennial — ٣ غرف</option>
-                        <option>Garden Millennial — ٣ غرف</option>
-                        <option>Skyvilla — ٣ غرف</option>
-                        <option>I-villa Garden — ٣ غرف</option>
-                        <option>غير متأكد بعد — محتاج استشارة</option>
-                      </select>
-                    </div>
-                    <div className="field">
-                      <label>الميزانية التقريبية</label>
-                      <div className="budget-chips">
-                        {["٥–٧ مليون", "٧–٩ مليون", "٩–١٢ مليون", "١٢ مليون+", "أحتاج استشارة"].map((b) => (
-                          <div
-                            key={b}
-                            className={`chip ${budget === b ? "active" : ""}`}
-                            onClick={() => setBudget(b)}
-                          >
-                            {b}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <button className="btn-submit" type="submit">
-                      <span>ابعتلي تفاصيل كريك ڤيو</span>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width={18} height={18}><path d="M5 12 H19 M19 12 L13 6 M19 12 L13 18" /></svg>
-                    </button>
-                    <div className="fineprint">بإرسال النموذج أنت توافق على تواصل فريق المبيعات معك — لن نشارك بياناتك مع أي طرف ثالث.</div>
-                  </form>
-                </>
-              )}
+                  </div>
+                  {formErrors.form ? (
+                    <p style={{ color: "#c41e3a", fontSize: 14, margin: "0 0 8px" }}>{formErrors.form}</p>
+                  ) : null}
+                  <button className="btn-submit" type="submit" disabled={formSubmitting}>
+                    <span>{formSubmitting ? "جاري الإرسال…" : "ابعتلي تفاصيل كريك ڤيو"}</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width={18} height={18}><path d="M5 12 H19 M19 12 L13 6 M19 12 L13 18" /></svg>
+                  </button>
+                  <div className="fineprint">بإرسال النموذج أنت توافق على تواصل فريق المبيعات معك — لن نشارك بياناتك مع أي طرف ثالث.</div>
+                </form>
+              </>
             </div>
           </div>
         </div>
@@ -589,14 +660,14 @@ export function CreekviewLanding() {
             <h2><small>تحب تكلمنا إزاي؟</small>اختار طريقتك<br />وفريق المبيعات هيرد عليك.</h2>
           </div>
           <div className="final-actions">
-            <a className="final-card" href={`tel:+${PHONE}`}>
+            <a className="final-card" href={CALL_HREF}>
               <div className="ic"><PhoneIcon size={22} /></div>
-              <div className="tx"><div className="a">CALL · مكالمة مباشرة</div><div className="b">+20 122 314 7238</div></div>
+              <div className="tx"><div className="a">CALL · مكالمة مباشرة</div><div className="b">اتصل بماونتن ڤيو</div></div>
               <div className="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width={22} height={22}><path d="M19 12 L5 12 M5 12 L11 6 M5 12 L11 18" /></svg></div>
             </a>
-            <a className="final-card" href={waLink("السلام عليكم، مهتم بمشروع كريك ڤيو")}>
+            <a className="final-card" href={creekWaPreset("inquiry")}>
               <div className="ic" style={{ background: "#25D366" }}><WhatsAppIcon size={22} /></div>
-              <div className="tx"><div className="a">WHATSAPP · أسرع رد</div><div className="b">+20 111 888 4994</div></div>
+              <div className="tx"><div className="a">WHATSAPP · أسرع رد</div><div className="b">راسلنا على واتساب</div></div>
               <div className="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width={22} height={22}><path d="M19 12 L5 12 M5 12 L11 6 M5 12 L11 18" /></svg></div>
             </a>
             <a className="final-card" href="#lead">
@@ -620,7 +691,7 @@ export function CreekviewLanding() {
       </footer>
 
       {/* FLOATING WHATSAPP */}
-      <a className="float-wa" href={waLink("السلام عليكم، مهتم بمشروع كريك ڤيو")} aria-label="WhatsApp">
+      <a className="float-wa" href={creekWaPreset("inquiry")} aria-label="WhatsApp">
         <WhatsAppIcon size={30} />
         <span className="tip">مستشار المبيعات متاح الآن</span>
       </a>
@@ -628,11 +699,11 @@ export function CreekviewLanding() {
       {/* MOBILE STICKY CTA */}
       <nav className="sticky-mobile" aria-label="Mobile CTA">
         <div className="row">
-          <a className="call" href={`tel:+${PHONE}`}>
+          <a className="call" href={CALL_HREF}>
             <PhoneIcon size={20} />
             اتصل بنا
           </a>
-          <a className="wa" href={waLink("السلام عليكم، مهتم بمشروع كريك ڤيو")}>
+          <a className="wa" href={creekWaPreset("inquiry")}>
             <WhatsAppIcon size={20} />
             واتساب
           </a>

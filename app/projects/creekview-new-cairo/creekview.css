@@ -97,6 +97,26 @@
   background: var(--cv-ink); display: grid; place-items: center; color: var(--cv-cream);
 }
 .cv-page .brand-mark svg { width: 22px; height: 22px; }
+/* Official Mountain View wordmark (.webp) replaces the geometric mark */
+.cv-page .brand-mark.brand-mark--mv {
+  width: auto;
+  height: auto;
+  min-width: unset;
+  min-height: unset;
+  background: transparent;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.cv-page .brand-mark.brand-mark--mv img {
+  display: block;
+  height: clamp(26px, 4vw, 34px);
+  width: auto;
+  max-width: min(150px, 42vw);
+  object-fit: contain;
+}
+.cv-page .brand:has(.brand-mark--mv) .brand-text .a { display: none; }
 .cv-page .brand-text { display: flex; flex-direction: column; line-height: 1; }
 .cv-page .brand-text .a { font-family: var(--cv-sans); font-size: 11px; letter-spacing: .28em; color: var(--cv-ink); }
 .cv-page .brand-text .b { font-family: var(--cv-serif); font-size: 20px; color: var(--cv-ink); margin-top: 3px; font-style: italic; }

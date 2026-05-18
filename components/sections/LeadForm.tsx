@@ -5,10 +5,9 @@ import { useRouter } from "next/navigation";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { FORMSPREE_LEAD_ENDPOINT } from "@/lib/formspree";
 import { isValidEgyptPhone, normalizePhone } from "@/lib/validation";
 import type { ProjectContent } from "@/types/project";
-
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/xdapyovz";
 const ANY_PROJECT = "غير محدد — أرشدوني";
 
 interface LeadFormProps {
@@ -81,7 +80,7 @@ export function LeadForm({
     if (name.trim()) payload.name = name.trim();
 
     try {
-      const res = await fetch(FORMSPREE_ENDPOINT, {
+      const res = await fetch(FORMSPREE_LEAD_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

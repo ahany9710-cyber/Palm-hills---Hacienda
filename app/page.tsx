@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import { CreekviewLanding } from "./projects/creekview-new-cairo/CreekviewLanding";
+import { ALL_PROJECTS } from "@/content/projects";
+import { SITE } from "@/content/site";
+import { LeadPopup } from "@/components/LeadPopup";
+import { SiteCreekLanding } from "@/components/landings/SiteCreekLanding";
 
 export const metadata: Metadata = {
   title: { absolute: "كريك ڤيو — ماونتن ڤيو · القاهرة الجديدة" },
@@ -15,5 +18,15 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <CreekviewLanding />;
+  return (
+    <>
+      <SiteCreekLanding />
+      <LeadPopup
+        projects={ALL_PROJECTS}
+        phoneNumber={SITE.phoneNumber}
+        whatsappNumber={SITE.whatsappNumber}
+        triggerSelector="#compare"
+      />
+    </>
+  );
 }
