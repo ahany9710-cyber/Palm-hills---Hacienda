@@ -8,31 +8,20 @@ import { Input } from "@/components/ui/Input";
 import { FORMSPREE_LEAD_ENDPOINT } from "@/lib/formspree";
 import { isValidEgyptPhone, normalizePhone } from "@/lib/validation";
 import type { ProjectContent } from "@/types/project";
+
 const ANY_PROJECT = "غير محدد — أرشدوني";
 
 interface LeadFormProps {
-  /** Projects shown as chips. */
   projects: ProjectContent[];
-  /** Optional pre-selected slug. */
   defaultProjectSlug?: string;
-  /** Optional override for the submit button label. */
   submitLabel?: string;
-  /** Source label sent to Formspree to distinguish entry points (e.g. "section" / "popup"). */
   source?: string;
-  /**
-   * Optional success callback, called *before* the redirect to /thank-you.
-   * Useful for closing a popup, marking session flags, etc.
-   */
   onSuccess?: () => void;
-  /** Compact paddings + font sizes — useful inside a popup. */
   compact?: boolean;
+  /** Matches Creekview `.lead-card` field styles — use inside `.cv-lead-popup-root` or `.cv-page`. */
+  appearance?: "default" | "creek";
 }
 
-/**
- * Pure 3-field lead capture form (phone / name / project chips).
- * POSTs to Formspree, then routes to /thank-you on success.
- * Used by both LeadFormSection and LeadPopup.
- */
 export function LeadForm({
   projects,
   defaultProjectSlug,
@@ -40,6 +29,7 @@ export function LeadForm({
   source = "section",
   onSuccess,
   compact = false,
+  appearance = "default",
 }: LeadFormProps) {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -115,6 +105,104 @@ export function LeadForm({
   const labelCls = "block text-sm font-semibold text-navy mb-1";
   const fieldGap = compact ? "space-y-3" : "space-y-4";
   const formId = source ? `lead-form-${source}` : "lead-form";
+
+  if (appearance === "creek") {
+    return (
+      <form
+        onSubmit={handleSubmit}
+        className="cv-popup-lead-form"
+        noValidate
+      >
+        <div className="row2c">
+          <div className="field">
+            <label htmlFor={`${formId}-phone`}>رقم الهاتف *</label>
+            <input
+              id={`${formId}-phone`}
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="مثال: 01012345678"
+              autoComplete="tel"
+              disabled={submitting}
+            />
+            <div className="err">{errors.phone ?? ""}</div>
+          </div>
+          <div className="field">
+            <label htmlFor={`${formId}-name`}>
+              الاسم <span style={{ opacity: 0.75 }}>(اختياري)</span>
+            </label>
+            <input
+              id={`${formId}-name`}
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="الاسم"
+              autoComplete="name"
+              disabled={submitting}
+            />
+            <div className="err" />
+          </div>
+        </div>
+
+        <div className="field" style={{ marginBottom: 8 }}>
+          <label>
+            المشروع المهتم به{" "}
+            <span style={{ opacity: 0.75 }}>(اختياري)</span>
+          </label>
+          <div className="budget-chips">
+            <button
+              type="button"
+              className={chosenProject === "" ? "chip active" : "chip"}
+              aria-pressed={chosenProject === ""}
+              disabled={submitting}
+              onClick={() => setChosenProject("")}
+            >
+              {ANY_PROJECT}
+            </button>
+            {projects.map((p) => (
+              <button
+                key={p.slug}
+                type="button"
+                className={
+                  chosenProject === p.slug ? "chip active" : "chip"
+                }
+                aria-pressed={chosenProject === p.slug}
+                disabled={submitting}
+                onClick={() => setChosenProject(p.slug)}
+              >
+                {p.projectName}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {errors.form ? (
+          <p
+            style={{
+              color: "#c0392b",
+              fontSize: 13,
+              marginTop: 8,
+              marginBottom: 0,
+            }}
+          >
+            {errors.form}
+          </p>
+        ) : null}
+
+        <button
+          type="submit"
+          className="btn-submit"
+          disabled={submitting}
+        >
+          <Send size={18} aria-hidden />
+          {submitting ? "جاري الإرسال…" : submitLabel}
+        </button>
+        <div className="fineprint">
+          معلوماتك تُستخدم فقط للتواصل بخصوص استفسارك. بدون رسائل سبام.
+        </div>
+      </form>
+    );
+  }
 
   return (
     <form

@@ -1,7 +1,4 @@
 import type { Metadata } from "next";
-import { ALL_PROJECTS } from "@/content/projects";
-import { SITE } from "@/content/site";
-import { LeadPopup } from "@/components/LeadPopup";
 import { SiteCreekLanding } from "@/components/landings/SiteCreekLanding";
 
 export const metadata: Metadata = {
@@ -18,15 +15,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return (
-    <>
-      <SiteCreekLanding />
-      <LeadPopup
-        projects={ALL_PROJECTS}
-        phoneNumber={SITE.phoneNumber}
-        whatsappNumber={SITE.whatsappNumber}
-        triggerSelector="#compare"
-      />
-    </>
-  );
+  return <SiteCreekLanding />;
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
 import Script from "next/script";
+import { AppLeadPopup } from "@/components/AppLeadPopup";
 import "./globals.css";
 
 const GOOGLE_ADS_ID = "AW-18066287198";
@@ -47,6 +48,7 @@ export default function RootLayout({
           `}
         </Script>
         {children}
+        <AppLeadPopup />
       </body>
     </html>
   );
