@@ -1,14 +1,26 @@
 import type { NextConfig } from "next";
 
 function buildCspDirectives(): string {
+  // Microsoft Clarity: https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-csp
+  const clarityScript = "https://www.clarity.ms https://scripts.clarity.ms";
+  const clarityConnect =
+    "https://*.clarity.ms https://c.bing.com https://www.clarity.ms";
+  // Google Ads / gtag (same layout as Clarity)
+  const googleAnalytics =
+    "https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com";
+  const googleConnect =
+    "https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://googleads.g.doubleclick.net";
+
   const parts = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clarityScript} ${googleAnalytics}`,
     // Dev: allow Turbopack / HMR WebSockets (same host, different scheme)
-    `connect-src 'self' https://formspree.io${process.env.NODE_ENV !== "production" ? " ws: wss:" : ""}`,
-    "img-src 'self' data: blob: https:",
+    `connect-src 'self' https://formspree.io ${clarityConnect} ${googleConnect}${
+      process.env.NODE_ENV !== "production" ? " ws: wss:" : ""
+    }`,
+    "img-src 'self' data: blob: https: https://c.clarity.ms",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com",
+    "font-src 'self' data: https://fonts.gstatic.com",
     "media-src 'self' blob:",
     "frame-src 'self'",
     "object-src 'none'",

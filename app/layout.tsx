@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Cairo } from "next/font/google";
 import Script from "next/script";
 import { AppLeadPopup } from "@/components/AppLeadPopup";
+import { ClarityRouteListener } from "@/components/ClarityRouteListener";
 import "./globals.css";
 
 const GOOGLE_ADS_ID = "AW-18066287198";
@@ -50,7 +52,7 @@ export default function RootLayout({
             gtag('config', '${GOOGLE_ADS_ID}');
           `}
         </Script>
-        <Script id="microsoft-clarity" strategy="afterInteractive">
+        <Script id="microsoft-clarity" strategy="beforeInteractive">
           {`
             (function(c,l,a,r,i,t,y){
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -60,6 +62,9 @@ export default function RootLayout({
           `}
         </Script>
         {children}
+        <Suspense fallback={null}>
+          <ClarityRouteListener />
+        </Suspense>
         <AppLeadPopup />
       </body>
     </html>
