@@ -12,11 +12,9 @@ export const HACIENDA = {
   developer: "بالم هيلز",
   slug: "hacienda-ras-el-hekma",
 
-  /** TODO: replace with real WhatsApp number (E.164 digits only, no plus) */
-  WHATSAPP_NUMBER: "20XXXXXXXXXX",
-
-  /** Palm Hills sales hotline short code */
-  PHONE: "19743",
+  /** E.164 digits only (01222200310) — used for tel: and WhatsApp */
+  WHATSAPP_NUMBER: "201222200310",
+  PHONE: "201222200310",
 
   LEAD_ENDPOINT: "https://formspree.io/f/xkoeneel",
 
@@ -321,23 +319,18 @@ export const HACIENDA = {
     {
       area: "أكتوبر",
       address: "Palm Hills October (Palm Central)",
-      phone: "+202 3886 0103",
-      mobile: "+20 10 6668 6108",
     },
     {
       area: "الإسكندرية",
       address: "30 Patrice Lumumba",
-      phone: "+203 033926010",
     },
     {
       area: "الزمالك",
       address: "1 El Kamel Mohamed St.",
-      phone: "+202 2737 5530",
     },
     {
       area: "التجمع الخامس",
       address: "Namaa Building #75, 1st section, Road 90",
-      phone: "+202 2810 4530",
     },
   ] as const,
 

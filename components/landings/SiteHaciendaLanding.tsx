@@ -3,9 +3,10 @@
 import type { ReactNode } from "react";
 import { HACIENDA } from "@/content/projects/hacienda-ras-el-hekma";
 import { HaciendaLeadForm } from "@/components/sections/HaciendaLeadForm";
+import { telHref } from "@/lib/phone-display";
 import "./hacienda.css";
 
-const TEL_HREF = `tel:${HACIENDA.PHONE}`;
+const TEL_HREF = telHref(HACIENDA.PHONE);
 const waUrl = (preset: string) => `/r/hh-wa?t=${encodeURIComponent(preset)}`;
 
 declare global {
@@ -142,14 +143,12 @@ export function SiteHaciendaLanding() {
             <a
               className="ph-btn ph-btn-call"
               href={TEL_HREF}
-              aria-label={`اتصل ${HACIENDA.PHONE}`}
+              aria-label="اتصل بنا"
               data-cta="call_header"
               onClick={onCall("call_header")}
             >
               <PhoneIcon size={16} />
-              <span className="label" dir="ltr">
-                {HACIENDA.PHONE}
-              </span>
+              <span className="label">اتصل بنا</span>
             </a>
             <a
               className="ph-btn ph-btn-wa"
@@ -598,18 +597,9 @@ export function SiteHaciendaLanding() {
               <article className="ph-office-card" key={office.area}>
                 <h3>{office.area}</h3>
                 <p className="ph-office-address">{office.address}</p>
-                <a className="ph-office-phone" href={`tel:${office.phone.replace(/\s/g, "")}`} dir="ltr">
-                  {office.phone}
+                <a className="ph-office-phone" href={TEL_HREF} aria-label="اتصل بنا">
+                  اتصل بنا
                 </a>
-                {"mobile" in office && office.mobile ? (
-                  <a
-                    className="ph-office-mobile"
-                    href={`tel:${office.mobile.replace(/\s/g, "")}`}
-                    dir="ltr"
-                  >
-                    {office.mobile}
-                  </a>
-                ) : null}
               </article>
             ))}
           </div>
@@ -645,7 +635,7 @@ export function SiteHaciendaLanding() {
                   onClick={onCall("call_lead_section")}
                 >
                   <PhoneIcon size={16} />
-                  <span dir="ltr">{HACIENDA.PHONE}</span>
+                  <span>اتصل بنا</span>
                 </a>
               </div>
             </div>
@@ -697,9 +687,10 @@ export function SiteHaciendaLanding() {
             href={TEL_HREF}
             data-cta="call_sticky"
             onClick={onCall("call_sticky")}
+            aria-label="اتصل بنا"
           >
             <PhoneIcon size={20} />
-            <span dir="ltr">{HACIENDA.PHONE}</span>
+            <span>اتصل بنا</span>
           </a>
           <a
             className="wa"

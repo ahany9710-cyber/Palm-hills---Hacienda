@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s | بالم هيلز",
   },
   description:
-    "إطلاق هاسيندا راس الحكمة من بالم هيلز على كيلو ٢٣٨ راس الحكمة: شاطئ ٤.٨ كم، خليجين طبيعيين، وحدات بفيو بحري. تواصل واتساب أو اتصل 19743.",
+    "إطلاق هاسيندا راس الحكمة من بالم هيلز على كيلو ٢٣٨ راس الحكمة: شاطئ ٤.٨ كم، خليجين طبيعيين، وحدات بفيو بحري. تواصل واتساب أو اتصل بنا.",
   metadataBase: new URL("https://mountainview.realestates.properties"),
   openGraph: {
     type: "website",
