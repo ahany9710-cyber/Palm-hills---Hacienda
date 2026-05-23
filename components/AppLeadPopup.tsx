@@ -2,14 +2,14 @@
 
 import { LeadPopup } from "@/components/LeadPopup";
 import { ALL_PROJECTS } from "@/content/projects";
-import { SITE } from "@/content/site";
+import { HACIENDA } from "@/content/projects/hacienda-ras-el-hekma";
 
 export function AppLeadPopup() {
   return (
     <LeadPopup
       projects={ALL_PROJECTS}
-      phoneNumber={SITE.phoneNumber}
-      whatsappNumber={SITE.whatsappNumber}
+      phoneNumber={HACIENDA.PHONE}
+      whatsappNumber={HACIENDA.WHATSAPP_NUMBER}
     />
   );
 }

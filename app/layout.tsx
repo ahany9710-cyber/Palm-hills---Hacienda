@@ -19,16 +19,16 @@ const cairo = Cairo({
 
 export const metadata: Metadata = {
   title: {
-    default: "ماونتن ڤيو — كريك ڤيو نيو كايرو، أليڤا، جراند فاليز",
-    template: "%s | ماونتن ڤيو",
+    default: "هاسيندا راس الحكمة — بالم هيلز · الساحل الشمالي",
+    template: "%s | بالم هيلز",
   },
   description:
-    "كريك ڤيو من ماونتن ڤيو في القاهرة الجديدة: واجهة مائية، جدول أسعار، وتقسيط حتى ١٤ سنة. أليڤا وجراند فاليز كخيارات إضافية. اتصل أو راسلنا واتساب.",
+    "إطلاق هاسيندا راس الحكمة من بالم هيلز على كيلو ٢٣٨ راس الحكمة: شاطئ ٤.٨ كم، خليجين طبيعيين، وحدات بفيو بحري. تواصل واتساب أو اتصل 19743.",
   metadataBase: new URL("https://mountainview.realestates.properties"),
   openGraph: {
     type: "website",
     locale: "ar_EG",
-    images: [{ url: "/projects/creekview-new-cairo/cover.png", width: 1200, height: 630 }],
+    images: [{ url: "/hacienda/brochure/hero-render.webp", width: 1200, height: 630 }],
   },
 };
 

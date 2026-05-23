@@ -6,5 +6,8 @@ export function digitsOnlyPhone(s: string): string {
 
 export function telHref(phone: string): string {
   const d = digitsOnlyPhone(phone);
-  return d ? `tel:+${d}` : "#";
+  if (!d) return "#";
+  // Egyptian short codes (e.g. Palm Hills 19743) — no country prefix
+  if (d.length <= 5) return `tel:${d}`;
+  return `tel:+${d}`;
 }
