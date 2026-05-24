@@ -2,6 +2,35 @@
    HACIENDA — Landing page interactions
    ========================================================= */
 
+const LOCALE = document.documentElement.lang === "en" ? "en" : "ar";
+
+const I18N = {
+  ar: {
+    callLabel: "اتصل بنا",
+    nameRequired: "الاسم مطلوب",
+    phoneRequired: "رقم الموبايل مطلوب",
+    phoneInvalid: "رقم موبايل مصري صحيح مطلوب (مثال: 01012345678)",
+    altInvalid: "رقم بديل غير صحيح (اختياري)",
+    submitting: "جاري الإرسال…",
+    project: "هاسيندا راس الحكمة",
+    formError: "تعذر الإرسال — يمكنك التواصل مباشرة على واتساب.",
+    formErrorWa: "تواصل على واتساب",
+  },
+  en: {
+    callLabel: "Call us",
+    nameRequired: "Name is required",
+    phoneRequired: "Mobile number is required",
+    phoneInvalid: "Enter a valid Egyptian mobile (e.g. 01012345678)",
+    altInvalid: "Invalid alternate number (optional)",
+    submitting: "Sending…",
+    project: "Hacienda Ras El Hekma",
+    formError: "Could not send — contact us directly on WhatsApp.",
+    formErrorWa: "Chat on WhatsApp",
+  },
+};
+
+const STR = I18N[LOCALE];
+
 // ----- Config (edit these in production) -----
 const CONFIG = {
   WHATSAPP_NUMBER: "201222200310",
@@ -11,13 +40,24 @@ const CONFIG = {
   POPUP_SCROLL_THRESHOLD: 0.7,
   POPUP_DELAY_MS: 12000,
   WA_PRESETS: {
-    default: "مهتم بـ هاسيندا راس الحكمة،ياريت أعرف التفاصيل والأسعار",
-    unit_villa: "مهتم بـ هاسيندا راس الحكمة — فيلا فائقة الفخامة. ياريت أعرف التفاصيل والأسعار.",
-    unit_chalet: "مهتم بـ هاسيندا راس الحكمة — شاليه. ياريت أعرف التفاصيل والأسعار.",
-    unit_twin: "مهتم بـ هاسيندا راس الحكمة — توين هاوس. ياريت أعرف التفاصيل والأسعار.",
-    unit_apartment: "مهتم بـ هاسيندا راس الحكمة — ستوديو. ياريت أعرف التفاصيل والأسعار.",
-    unit_branded: "مهتم بـ هاسيندا راس الحكمة — Branded Residences. ياريت أعرف التفاصيل والأسعار.",
-    form_followup: "مهتم بـ هاسيندا راس الحكمة، لسه بعت استمارة — ياريت التفاصيل والأسعار.",
+    ar: {
+      default: "مهتم بـ هاسيندا راس الحكمة،ياريت أعرف التفاصيل والأسعار",
+      unit_villa: "مهتم بـ هاسيندا راس الحكمة — فيلا فائقة الفخامة. ياريت أعرف التفاصيل والأسعار.",
+      unit_chalet: "مهتم بـ هاسيندا راس الحكمة — شاليه. ياريت أعرف التفاصيل والأسعار.",
+      unit_twin: "مهتم بـ هاسيندا راس الحكمة — توين هاوس. ياريت أعرف التفاصيل والأسعار.",
+      unit_apartment: "مهتم بـ هاسيندا راس الحكمة — ستوديو. ياريت أعرف التفاصيل والأسعار.",
+      unit_branded: "مهتم بـ هاسيندا راس الحكمة — Branded Residences. ياريت أعرف التفاصيل والأسعار.",
+      form_followup: "مهتم بـ هاسيندا راس الحكمة، لسه بعت استمارة — ياريت التفاصيل والأسعار.",
+    },
+    en: {
+      default: "Interested in Hacienda Ras El Hekma — please share details and prices.",
+      unit_villa: "Interested in Hacienda Ras El Hekma — Ultraluxury Villa. Please share details and prices.",
+      unit_chalet: "Interested in Hacienda Ras El Hekma — Chalet. Please share details and prices.",
+      unit_twin: "Interested in Hacienda Ras El Hekma — Twin House. Please share details and prices.",
+      unit_apartment: "Interested in Hacienda Ras El Hekma — Studio. Please share details and prices.",
+      unit_branded: "Interested in Hacienda Ras El Hekma — Branded Residences. Please share details and prices.",
+      form_followup: "Interested in Hacienda Ras El Hekma — I just submitted the form. Please share details and prices.",
+    },
   },
 };
 
@@ -27,7 +67,8 @@ const LEAD_SUBMITTED_KEY = "hh_lead_submitted";
 
 // ----- WhatsApp helpers -----
 function waUrl(presetKey) {
-  const msg = CONFIG.WA_PRESETS[presetKey] || CONFIG.WA_PRESETS.default;
+  const presets = CONFIG.WA_PRESETS[LOCALE] || CONFIG.WA_PRESETS.ar;
+  const msg = presets[presetKey] || presets.default;
   return `https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 }
 
@@ -46,15 +87,23 @@ function markLeadSubmitted() {
 }
 
 function hydrateCallLabels() {
-  const label = "اتصل بنا";
   document.querySelectorAll("[data-tel] .call-label, .sticky-mobile a.call .call-label").forEach((el) => {
-    el.textContent = label;
+    el.textContent = STR.callLabel;
   });
   document.querySelectorAll(".sticky-mobile a.call, [data-tel].btn-call").forEach((el) => {
-    el.setAttribute("aria-label", label);
+    el.setAttribute("aria-label", STR.callLabel);
     for (const node of [...el.childNodes]) {
       if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) node.remove();
     }
+  });
+}
+
+function setupLangToggle() {
+  document.querySelectorAll("[data-lang-switch]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.langSwitch;
+      if (target) window.location.href = target;
+    });
   });
 }
 
@@ -92,14 +141,14 @@ function setupLeadForm({ formId, successId, source, ctaId, onSuccess }) {
     const phone = fields.phone.value.trim().replace(/\s/g, "");
     const alt = fields.altPhone.value.trim().replace(/\s/g, "");
 
-    if (!name) { errs.name.textContent = "الاسم مطلوب"; ok = false; }
-    if (!phone) { errs.phone.textContent = "رقم الموبايل مطلوب"; ok = false; }
+    if (!name) { errs.name.textContent = STR.nameRequired; ok = false; }
+    if (!phone) { errs.phone.textContent = STR.phoneRequired; ok = false; }
     else if (!EG_PHONE.test(phone)) {
-      errs.phone.textContent = "رقم موبايل مصري صحيح مطلوب (مثال: 01012345678)";
+      errs.phone.textContent = STR.phoneInvalid;
       ok = false;
     }
     if (alt && !EG_PHONE.test(alt)) {
-      errs.altPhone.textContent = "رقم بديل غير صحيح (اختياري)";
+      errs.altPhone.textContent = STR.altInvalid;
       ok = false;
     }
     return ok;
@@ -112,14 +161,15 @@ function setupLeadForm({ formId, successId, source, ctaId, onSuccess }) {
     submitBtn.disabled = true;
     const labelEl = submitBtn.querySelector(".label");
     const originalLabel = labelEl.textContent;
-    labelEl.textContent = "جاري الإرسال…";
+    labelEl.textContent = STR.submitting;
 
     const payload = {
       name: fields.name.value.trim(),
       phone: fields.phone.value.trim().replace(/\s/g, ""),
       unit_type: fields.unitType.value,
-      project: "هاسيندا راس الحكمة",
+      project: STR.project,
       source,
+      locale: LOCALE,
     };
     const alt = fields.altPhone.value.trim().replace(/\s/g, "");
     if (alt) payload.alt_phone = alt;
@@ -143,10 +193,10 @@ function setupLeadForm({ formId, successId, source, ctaId, onSuccess }) {
       onSuccess?.();
     } catch (err) {
       errs.form.innerHTML = `
-        <p>تعذر الإرسال — يمكنك التواصل مباشرة على واتساب.</p>
+        <p>${STR.formError}</p>
         <a class="btn btn-wa btn-block" href="${waUrl("form_followup")}" data-cta="whatsapp_form_error">
           <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.435 9.884-9.881 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.088 5.972L0 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-          <span>تواصل على واتساب</span>
+          <span>${STR.formErrorWa}</span>
         </a>`;
     } finally {
       submitBtn.disabled = false;
@@ -228,6 +278,7 @@ function setupLeadPopup() {
 
 // ----- Boot -----
 document.addEventListener("DOMContentLoaded", () => {
+  setupLangToggle();
   document.querySelectorAll("[data-tel]").forEach((el) => {
     el.setAttribute("href", CONFIG.TEL_HREF);
   });

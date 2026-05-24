@@ -320,7 +320,14 @@ button { font: inherit; cursor: pointer; }
   .header .row { height: 64px; }
   .brand-developer { font-size: 9px; }
   .brand-project { font-size: 16px; }
-  .lang-toggle { display: none; }
+  .header-actions { gap: 8px; flex-shrink: 0; }
+  .lang-toggle {
+    display: flex;
+    padding: 0 10px;
+    height: 44px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
   .btn-call .label { display: none; }
   .btn-call { padding: 0 12px; width: 44px; }
   .header .btn-wa .label { display: none; }
@@ -1714,4 +1721,32 @@ body.lead-popup-open {
   height: 1px;
   background: var(--hairline);
   margin: 80px 0;
+}
+
+/* =========================================================
+   ENGLISH / LTR overrides
+   ========================================================= */
+html[lang="en"] {
+  direction: ltr;
+}
+
+html[lang="en"] .explore-badge {
+  left: auto;
+  right: clamp(20px, 4vw, 56px);
+}
+
+html[lang="en"] .hero-inner {
+  text-align: left;
+}
+
+html[lang="en"] .units-intro,
+html[lang="en"] .section-head,
+html[lang="en"] .lead-left,
+html[lang="en"] .trust-grid > div:last-child {
+  text-align: left;
+}
+
+html[lang="en"] .popup-perks {
+  padding-left: 0;
+  padding-right: 0;
 }
