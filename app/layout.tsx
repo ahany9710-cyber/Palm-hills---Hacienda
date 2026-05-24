@@ -8,7 +8,7 @@ import "./globals.css";
 const GOOGLE_ADS_ID = "AW-18066287198";
 
 /** Microsoft Clarity project ID */
-const CLARITY_PROJECT_ID = "wu1ulzvsll";
+const CLARITY_PROJECT_ID = "wvvlksg43d";
 
 const cairo = Cairo({
   variable: "--font-cairo",
