@@ -2,7 +2,11 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { fadeInUp, noMotion } from "@/lib/motion";
-import type { TrustFact } from "@/content/site";
+
+interface TrustFact {
+  value: string;
+  label: string;
+}
 
 interface TrustStripSectionProps {
   facts: TrustFact[];

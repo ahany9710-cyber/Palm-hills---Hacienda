@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { content } from "@/content/projects/creekview-new-cairo";
 
-/** Preset keys — CreekviewLanding + SiteCreekLanding hub. */
+/** Preset keys for Creekview landing CTAs. */
 const PRESET: Record<string, string> = {
   inquiry: "السلام عليكم، مهتم بمشروع كريك ڤيو",
   details:

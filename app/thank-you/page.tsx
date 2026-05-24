@@ -2,18 +2,18 @@
 
 import Link from "next/link";
 import { MessageCircle, Phone } from "lucide-react";
+import { HACIENDA } from "@/content/projects/hacienda-ras-el-hekma";
 import { buildWhatsAppUrl } from "@/lib/utils";
 import { telHref } from "@/lib/phone-display";
-import { SITE } from "@/content/site";
 import { Button } from "@/components/ui/Button";
 import { MinimalFooter } from "@/components/layout/MinimalFooter";
 
 export default function ThankYouPage() {
   const whatsappUrl = buildWhatsAppUrl(
-    SITE.whatsappNumber,
+    HACIENDA.WHATSAPP_NUMBER,
     "السلام عليكم، تم إرسال استفساري عبر الموقع وأرغب في متابعة الحجز."
   );
-  const callUrl = telHref(SITE.phoneNumber);
+  const callUrl = telHref(HACIENDA.PHONE);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -55,7 +55,7 @@ export default function ThankYouPage() {
           </div>
         </div>
       </div>
-      <MinimalFooter tagline={`${SITE.developer} — مشاريع في القاهرة الجديدة، المستقبل سيتي، والعاصمة الإدارية`} />
+      <MinimalFooter tagline={`${HACIENDA.developer} — ${HACIENDA.projectName}`} />
     </div>
   );
 }
