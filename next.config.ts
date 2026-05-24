@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 function buildCspDirectives(): string {
   // Microsoft Clarity: https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-csp
@@ -36,6 +37,14 @@ function buildCspDirectives(): string {
 }
 
 const nextConfig: NextConfig = {
+  // Pin Turbopack/Next workspace root to this project folder.
+  // The parent dir name contains a space ("palm hills hacienda"), which
+  // can confuse auto-detection and cause CSS imports (e.g. `tailwindcss`)
+  // to be resolved from the wrong directory.
+  turbopack: {
+    root: path.resolve(process.cwd()),
+  },
+  outputFileTracingRoot: path.resolve(process.cwd()),
   images: {
     remotePatterns: [
       {
