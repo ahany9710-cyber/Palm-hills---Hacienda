@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Cairo } from "next/font/google";
 import Script from "next/script";
-import { AppLeadPopup } from "@/components/AppLeadPopup";
 import { ClarityRouteListener } from "@/components/ClarityRouteListener";
 import "./globals.css";
 
@@ -65,7 +64,6 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <ClarityRouteListener />
         </Suspense>
-        <AppLeadPopup />
       </body>
     </html>
   );

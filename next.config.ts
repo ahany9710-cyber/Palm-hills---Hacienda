@@ -61,7 +61,15 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   async redirects() {
-    return [{ source: "/aliva", destination: "/", permanent: true }];
+    return [
+      { source: "/aliva", destination: "/", permanent: true },
+      { source: "/prototype", destination: "/", permanent: false },
+    ];
+  },
+  async rewrites() {
+    return {
+      beforeFiles: [{ source: "/", destination: "/prototype/index.html" }],
+    };
   },
   async headers() {
     return [

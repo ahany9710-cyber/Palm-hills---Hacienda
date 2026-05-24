@@ -4,7 +4,7 @@ import {
   WHATSAPP_DEFAULT_MSG,
 } from "@/content/projects/hacienda-ras-el-hekma";
 
-/** Preset keys for SiteHaciendaLanding CTAs */
+/** Preset keys for Hacienda landing CTAs */
 const PRESET: Record<string, string> = {
   ...HACIENDA.whatsappPresets,
   inquiry: WHATSAPP_DEFAULT_MSG,
