@@ -778,6 +778,9 @@ button { font: inherit; cursor: pointer; }
   object-fit: cover;
   object-position: center;
   display: block;
+  transform: scale(1.1);
+  transition: transform 0.85s var(--ease);
+  will-change: transform;
 }
 .unit-img .placeholder {
   width: 100%;
@@ -989,6 +992,9 @@ button { font: inherit; cursor: pointer; }
   object-fit: cover;
   object-position: center;
   display: block;
+  transform: scale(1.1);
+  transition: transform 0.85s var(--ease);
+  will-change: transform;
 }
 .gal .placeholder { width: 100%; height: 100%; min-height: 220px; }
 .gal-cap {
@@ -1020,6 +1026,10 @@ button { font: inherit; cursor: pointer; }
 .g-shore .placeholder { background: linear-gradient(180deg, oklch(0.72 0.08 220) 0%, oklch(0.42 0.07 220) 100%); border-radius: 1000px 1000px 8px 8px; }
 .g-master { grid-column: span 5; }
 .g-master .placeholder { background: linear-gradient(135deg, oklch(0.55 0.06 90) 0%, oklch(0.35 0.05 100) 100%); }
+.g-master > img,
+.g-parks > img {
+  min-height: 280px;
+}
 .g-parks { grid-column: span 5; }
 .g-parks .placeholder { background: linear-gradient(180deg, oklch(0.68 0.08 130) 0%, oklch(0.4 0.06 150) 100%); }
 .g-core { grid-column: span 4; grid-row: span 2; }
@@ -1656,6 +1666,155 @@ body.lead-popup-open {
 .fade-in.in {
   opacity: 1;
   transform: none;
+}
+
+/* Unit + gallery image motion */
+@keyframes motionImgIn {
+  from {
+    transform: scale(1.14) translateY(14px);
+  }
+  to {
+    transform: scale(1) translateY(0);
+  }
+}
+
+.units-grid.in .unit-card .unit-img img {
+  animation: motionImgIn 1.15s var(--ease) both;
+}
+.units-grid.in .unit-card:nth-child(1) .unit-img img { animation-delay: 0.05s; }
+.units-grid.in .unit-card:nth-child(2) .unit-img img { animation-delay: 0.14s; }
+.units-grid.in .unit-card:nth-child(3) .unit-img img { animation-delay: 0.23s; }
+.units-grid.in .unit-card:nth-child(4) .unit-img img { animation-delay: 0.32s; }
+.units-grid.in .unit-card:nth-child(5) .unit-img img { animation-delay: 0.41s; }
+
+.gallery-grid.in .gal > img {
+  animation: motionImgIn 1.2s var(--ease) both;
+}
+.gallery-grid.in .gal:nth-child(1) > img { animation-delay: 0.06s; }
+.gallery-grid.in .gal:nth-child(2) > img { animation-delay: 0.14s; }
+.gallery-grid.in .gal:nth-child(3) > img { animation-delay: 0.22s; }
+.gallery-grid.in .gal:nth-child(4) > img { animation-delay: 0.30s; }
+.gallery-grid.in .gal:nth-child(5) > img { animation-delay: 0.38s; }
+.gallery-grid.in .gal:nth-child(6) > img { animation-delay: 0.46s; }
+
+/* Featured gallery pair — masterplan + parks */
+@keyframes motionMasterIn {
+  from {
+    transform: scale(1.2) translate3d(32px, 18px, 0);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(1) translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes motionParksIn {
+  from {
+    transform: scale(1.2) translate3d(-32px, 18px, 0);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(1) translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes kenBurnsMaster {
+  from {
+    transform: scale(1) translate3d(0, 0, 0);
+    object-position: 50% 44%;
+  }
+  to {
+    transform: scale(1.12) translate3d(-2.5%, -1.5%, 0);
+    object-position: 50% 56%;
+  }
+}
+
+@keyframes kenBurnsParks {
+  from {
+    transform: scale(1.04) translate3d(0, 0, 0);
+    object-position: 46% 50%;
+  }
+  to {
+    transform: scale(1.14) translate3d(2.5%, -1%, 0);
+    object-position: 54% 50%;
+  }
+}
+
+.gallery-grid.in .g-master > img {
+  animation:
+    motionMasterIn 1.35s var(--ease) both,
+    kenBurnsMaster 22s ease-in-out 1.35s infinite alternate;
+}
+
+.gallery-grid.in .g-parks > img {
+  animation:
+    motionParksIn 1.35s var(--ease) both,
+    kenBurnsParks 24s ease-in-out 1.5s infinite alternate;
+}
+
+.g-master::after,
+.g-parks::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 55%,
+    rgba(20, 20, 20, 0.28) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+  z-index: 1;
+}
+
+.gallery-grid.in .g-master::after,
+.gallery-grid.in .g-parks::after {
+  opacity: 1;
+}
+
+.g-master .gal-cap,
+.g-master .gal-en,
+.g-parks .gal-cap,
+.g-parks .gal-en {
+  z-index: 2;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .g-master:hover > img {
+    animation-play-state: paused, paused;
+    transform: scale(1.1);
+    transition: transform 0.7s var(--ease);
+  }
+  .g-parks:hover > img {
+    animation-play-state: paused, paused;
+    transform: scale(1.12);
+    transition: transform 0.7s var(--ease);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .unit-img:hover img,
+  .gal:hover > img {
+    transform: scale(1.06);
+    transition-duration: 0.65s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unit-img img,
+  .gal > img {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+    object-position: center !important;
+  }
+  .g-master::after,
+  .g-parks::after {
+    opacity: 1;
+  }
 }
 
 /* SVG icon stroke */

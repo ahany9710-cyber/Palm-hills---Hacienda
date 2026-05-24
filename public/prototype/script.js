@@ -64,6 +64,25 @@ const CONFIG = {
 const EG_PHONE = /^01[0125][0-9]{8}$/;
 const POPUP_STORAGE_KEY = "hh_lead_popup_seen";
 const LEAD_SUBMITTED_KEY = "hh_lead_submitted";
+/** If the page is barely scrollable, wait for the timer instead of scroll depth. */
+const MIN_SCROLL_ROOM_PX = 120;
+
+let popupDisposeTriggers = null;
+
+function shouldSkipPopup() {
+  try {
+    if (sessionStorage.getItem(LEAD_SUBMITTED_KEY) === "1") return true;
+    if (sessionStorage.getItem(POPUP_STORAGE_KEY) === "1") return true;
+  } catch (_) {}
+  return false;
+}
+
+function markLeadSubmitted() {
+  try {
+    sessionStorage.setItem(LEAD_SUBMITTED_KEY, "1");
+  } catch (_) {}
+  popupDisposeTriggers?.();
+}
 
 // ----- WhatsApp helpers -----
 function waUrl(presetKey) {
@@ -78,12 +97,6 @@ function trackCta(id) {
 
 function trackFormLead(source) {
   console.log("[lead]", source);
-}
-
-function markLeadSubmitted() {
-  try {
-    sessionStorage.setItem(LEAD_SUBMITTED_KEY, "1");
-  } catch (_) {}
 }
 
 function hydrateCallLabels() {
@@ -211,19 +224,25 @@ function setupLeadPopup() {
   if (!popup) return;
 
   let opened = false;
+  let timerId = null;
+  const scrollOpts = { passive: true };
 
-  function shouldSkipPopup() {
-    try {
-      if (sessionStorage.getItem(LEAD_SUBMITTED_KEY) === "1") return true;
-      if (sessionStorage.getItem(POPUP_STORAGE_KEY) === "1") return true;
-    } catch (_) {}
-    return false;
+  function disposeTriggers() {
+    if (timerId !== null) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
+    window.removeEventListener("scroll", onScrollCheck, scrollOpts);
   }
 
   function openPopup(trigger) {
     if (opened || shouldSkipPopup()) return;
     opened = true;
-    try { sessionStorage.setItem(POPUP_STORAGE_KEY, "1"); } catch (_) {}
+    disposeTriggers();
+
+    try {
+      sessionStorage.setItem(POPUP_STORAGE_KEY, "1");
+    } catch (_) {}
 
     popup.hidden = false;
     popup.setAttribute("aria-hidden", "false");
@@ -240,7 +259,9 @@ function setupLeadPopup() {
     popup.setAttribute("aria-hidden", "true");
     document.body.classList.remove("lead-popup-open");
     trackCta("popup_close");
-    setTimeout(() => { popup.hidden = true; }, 350);
+    setTimeout(() => {
+      popup.hidden = true;
+    }, 350);
   }
 
   popup.querySelectorAll("[data-popup-close]").forEach((el) => {
@@ -255,25 +276,70 @@ function setupLeadPopup() {
     const doc = document.documentElement;
     const scrollTop = window.scrollY || doc.scrollTop;
     const scrollHeight = doc.scrollHeight - window.innerHeight;
-    if (scrollHeight <= 0) return 1;
+    if (scrollHeight <= MIN_SCROLL_ROOM_PX) return 0;
     return scrollTop / scrollHeight;
   }
 
   function onScrollCheck() {
     if (getScrollDepth() >= CONFIG.POPUP_SCROLL_THRESHOLD) {
       openPopup("scroll");
-      window.removeEventListener("scroll", onScrollCheck, { passive: true });
     }
   }
 
-  if (!shouldSkipPopup()) {
-    window.addEventListener("scroll", onScrollCheck, { passive: true });
-    onScrollCheck();
+  popupDisposeTriggers = disposeTriggers;
 
-    setTimeout(() => openPopup("timer"), CONFIG.POPUP_DELAY_MS);
+  if (!shouldSkipPopup()) {
+    window.addEventListener("scroll", onScrollCheck, scrollOpts);
+    onScrollCheck();
+    timerId = setTimeout(() => openPopup("timer"), CONFIG.POPUP_DELAY_MS);
   }
 
-  return { closePopup };
+  return { closePopup, disposeTriggers };
+}
+
+function setupImageParallax() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const frames = [...document.querySelectorAll(".unit-img, .gal")];
+  if (!frames.length) return;
+
+  let ticking = false;
+
+  function update() {
+    ticking = false;
+    const vh = window.innerHeight;
+
+    for (const frame of frames) {
+      const img = frame.querySelector("img");
+      if (!img) continue;
+
+      /* Ken Burns handles these in CSS — skip inline parallax */
+      if (frame.classList.contains("g-master") || frame.classList.contains("g-parks")) {
+        continue;
+      }
+
+      const rect = frame.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > vh) {
+        img.style.objectPosition = "center center";
+        continue;
+      }
+
+      const progress = (vh - rect.top) / (vh + rect.height);
+      const shift = (progress - 0.5) * 24;
+      img.style.objectPosition = `center calc(50% + ${shift * 0.35}px)`;
+    }
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll, { passive: true });
+  update();
 }
 
 // ----- Boot -----
@@ -309,6 +375,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, { threshold: 0.12 });
   document.querySelectorAll(".fade-in").forEach((el) => io.observe(el));
+
+  setupImageParallax();
 
   setupLeadForm({
     formId: "lead-form",
