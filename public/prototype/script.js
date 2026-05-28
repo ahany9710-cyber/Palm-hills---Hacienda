@@ -33,10 +33,10 @@ const STR = I18N[LOCALE];
 
 // ----- Config (edit these in production) -----
 const CONFIG = {
-  WHATSAPP_NUMBER: "201222200310",
+  WHATSAPP_NUMBER: "201156004243",
   LEAD_ENDPOINT: "https://formspree.io/f/xdajdyzd",
-  PHONE: "201222200310",
-  TEL_HREF: "tel:+201222200310",
+  PHONE: "201156004243",
+  TEL_HREF: "tel:+201156004243",
   POPUP_SCROLL_THRESHOLD: 0.7,
   POPUP_DELAY_MS: 12000,
   WA_PRESETS: {
