@@ -9,23 +9,25 @@ const I18N = {
     callLabel: "اتصل بنا",
     nameRequired: "الاسم مطلوب",
     phoneRequired: "رقم الموبايل مطلوب",
-    phoneInvalid: "رقم موبايل مصري صحيح مطلوب (مثال: 01012345678)",
-    altInvalid: "رقم بديل غير صحيح (اختياري)",
+    phoneInvalid: "يجب أن يحتوي الرقم على ١١ رقم على الأقل",
+    altInvalid: "الرقم البديل يجب أن يحتوي على ١١ رقم على الأقل",
     submitting: "جاري الإرسال…",
     project: "هاسيندا راس الحكمة",
     formError: "تعذر الإرسال — يمكنك التواصل مباشرة على واتساب.",
     formErrorWa: "تواصل على واتساب",
+    thankYouUrl: "/prototype/thank-you.html",
   },
   en: {
     callLabel: "Call us",
     nameRequired: "Name is required",
     phoneRequired: "Mobile number is required",
-    phoneInvalid: "Enter a valid Egyptian mobile (e.g. 01012345678)",
-    altInvalid: "Invalid alternate number (optional)",
+    phoneInvalid: "Phone number must contain at least 11 digits",
+    altInvalid: "Alternate number must contain at least 11 digits",
     submitting: "Sending…",
     project: "Hacienda Ras El Hekma",
     formError: "Could not send — contact us directly on WhatsApp.",
     formErrorWa: "Chat on WhatsApp",
+    thankYouUrl: "/prototype/en/thank-you.html",
   },
 };
 
@@ -61,7 +63,10 @@ const CONFIG = {
   },
 };
 
-const EG_PHONE = /^01[0125][0-9]{8}$/;
+function countDigits(str) {
+  return (str.match(/\d/g) || []).length;
+}
+const MIN_PHONE_DIGITS = 11;
 const POPUP_STORAGE_KEY = "hh_lead_popup_seen";
 const LEAD_SUBMITTED_KEY = "hh_lead_submitted";
 /** If the page is barely scrollable, wait for the timer instead of scroll depth. */
@@ -156,11 +161,11 @@ function setupLeadForm({ formId, successId, source, ctaId, onSuccess }) {
 
     if (!name) { errs.name.textContent = STR.nameRequired; ok = false; }
     if (!phone) { errs.phone.textContent = STR.phoneRequired; ok = false; }
-    else if (!EG_PHONE.test(phone)) {
+    else if (countDigits(phone) < MIN_PHONE_DIGITS) {
       errs.phone.textContent = STR.phoneInvalid;
       ok = false;
     }
-    if (alt && !EG_PHONE.test(alt)) {
+    if (alt && countDigits(alt) < MIN_PHONE_DIGITS) {
       errs.altPhone.textContent = STR.altInvalid;
       ok = false;
     }
@@ -199,11 +204,8 @@ function setupLeadForm({ formId, successId, source, ctaId, onSuccess }) {
       trackCta(ctaId);
       markLeadSubmitted();
 
-      form.hidden = true;
-      successPanel.hidden = false;
-      successPanel.style.display = "flex";
-
       onSuccess?.();
+      window.location.href = STR.thankYouUrl;
     } catch (err) {
       errs.form.innerHTML = `
         <p>${STR.formError}</p>
