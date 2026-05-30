@@ -5,7 +5,7 @@ import Script from "next/script";
 import { ClarityRouteListener } from "@/components/ClarityRouteListener";
 import "./globals.css";
 
-const GOOGLE_ADS_ID = "AW-18066287198";
+const GOOGLE_ADS_ID = "AW-17012763903";
 
 /** Microsoft Clarity project ID */
 const CLARITY_PROJECT_ID = "wvvlksg43d";

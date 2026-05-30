@@ -8,9 +8,11 @@ function buildCspDirectives(): string {
     "https://*.clarity.ms https://c.bing.com https://www.clarity.ms";
   // Google Ads / gtag (same layout as Clarity)
   const googleAnalytics =
-    "https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com";
+    "https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://www.google.com";
+  // Endpoints gtag uses to POST conversions / remarketing / enhanced conversions.
+  // Missing any of these silently drops the data before it reaches Google Ads.
   const googleConnect =
-    "https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://googleads.g.doubleclick.net";
+    "https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://googleads.g.doubleclick.net https://td.doubleclick.net https://www.googleadservices.com https://www.google.com https://google.com https://pagead2.googlesyndication.com";
 
   const parts = [
     "default-src 'self'",
